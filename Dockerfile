@@ -1,19 +1,14 @@
-FROM python:3.11-slim
-
+# Usa una imagen base de Python
+FROM python:3.13-slim
+# Establece el directorio de trabajo
 WORKDIR /app
-
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
+# Copia los archivos de requirements.txt e instálalos
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
+# Copia el resto del código al contenedor
 COPY . .
-
-EXPOSE 8080
-
-# Comando optimizado con manejo de errores
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 4"]
+# Expone el puerto en el que la aplicación escucha
+EXPOSE 8000
+# Comando para ejecutar migraciones y precargar datos antes de iniciar la app
+#CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
